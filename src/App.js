@@ -13,9 +13,8 @@ function App() {
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
-  const API_URL = 'http://172.245.56.116:65000';
+  const API_URL = 'http://siso_forum:8080'; // Use backend container name and port
 
-  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       const token = Cookies.get('access_token');
@@ -35,11 +34,10 @@ function App() {
     checkAuth();
   }, []);
 
-  // Handle login submission
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await axios.post(`${API_URL}/auth/login`, { // Added /auth/ prefix
         username,
         password,
       });
@@ -55,7 +53,6 @@ function App() {
     }
   };
 
-  // Handle register submission
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (password.length < 8) {
@@ -63,11 +60,11 @@ function App() {
       return;
     }
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
+      const response = await axios.post(`${API_URL}/auth/register`, { // Added /auth/ prefix
         username,
         email,
         password,
-        nickname: nickname || undefined, // Send undefined if empty
+        nickname: nickname || undefined,
       });
       const { access_token } = response.data;
       Cookies.set('access_token', access_token, { expires: 7 });
@@ -83,7 +80,6 @@ function App() {
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     Cookies.remove('access_token');
     setIsLoggedIn(false);
