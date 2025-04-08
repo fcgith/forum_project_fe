@@ -15,7 +15,7 @@ function App() {
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
-  const API_URL = 'http://siso_forum:8080';
+  const API_URL = 'http://172.245.56.116:65000';
 
   useEffect(() => {
     console.log('useEffect triggered for auth check');
