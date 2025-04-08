@@ -7,5 +7,5 @@ RUN npm run build
 # Install curl
 RUN apt update && apt install -y curl
 RUN npm install -g serve
-EXPOSE 3000
-CMD ["serve", "-s", "build", "-l", "3000"]
+EXPOSE 3080
+CMD ["serve", "-s", "build", "-l", "3080"]
