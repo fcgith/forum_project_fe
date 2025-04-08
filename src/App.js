@@ -5,6 +5,8 @@ import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
+  console.log('App component rendered'); // Log on render
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -13,22 +15,28 @@ function App() {
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
-  const API_URL = 'http://siso_forum:8080'; // Use backend container name and port
+  const API_URL = 'http://siso_forum:8080';
 
   useEffect(() => {
+    console.log('useEffect triggered for auth check');
     const checkAuth = async () => {
       const token = Cookies.get('access_token');
+      console.log('Token from cookies:', token);
       if (token) {
         try {
+          console.log('Sending auth check request to:', `${API_URL}/auth/check`);
           const response = await axios.get(`${API_URL}/auth/check`, {
             headers: { Authorization: `Bearer ${token}` },
           });
+          console.log('Auth check response:', response.data);
           setIsLoggedIn(response.data.isAuthenticated);
         } catch (error) {
-          console.error('Auth check failed:', error);
+          console.error('Auth check failed:', error.message, error.response?.data);
           setIsLoggedIn(false);
           Cookies.remove('access_token');
         }
+      } else {
+        console.log('No token found, user not logged in');
       }
     };
     checkAuth();
@@ -36,11 +44,14 @@ function App() {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    console.log('Login form submitted with:', { username, password });
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { // Added /auth/ prefix
+      console.log('Sending login request to:', `${API_URL}/auth/login`);
+      const response = await axios.post(`${API_URL}/auth/login`, {
         username,
         password,
       });
+      console.log('Login response:', response.data);
       const { access_token } = response.data;
       Cookies.set('access_token', access_token, { expires: 7 });
       setIsLoggedIn(true);
@@ -49,23 +60,27 @@ function App() {
       setUsername('');
       setPassword('');
     } catch (error) {
-      setError(error.response?.data?.message || 'Login failed');
+      console.error('Login error:', error.message, error.response?.data);
+      setError(error.response?.data?.message || error.message || 'Login failed');
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    console.log('Register form submitted with:', { username, email, password, nickname });
     if (password.length < 8) {
       setError('Password must be at least 8 characters long');
       return;
     }
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, { // Added /auth/ prefix
+      console.log('Sending register request to:', `${API_URL}/auth/register`);
+      const response = await axios.post(`${API_URL}/auth/register`, {
         username,
         email,
         password,
         nickname: nickname || undefined,
       });
+      console.log('Register response:', response.data);
       const { access_token } = response.data;
       Cookies.set('access_token', access_token, { expires: 7 });
       setIsLoggedIn(true);
@@ -76,11 +91,13 @@ function App() {
       setPassword('');
       setNickname('');
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed');
+      console.error('Register error:', error.message, error.response?.data);
+      setError(error.response?.data?.message || error.message || 'Registration failed');
     }
   };
 
   const handleLogout = () => {
+    console.log('Logging out');
     Cookies.remove('access_token');
     setIsLoggedIn(false);
   };
