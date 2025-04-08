@@ -1,0 +1,20 @@
+cd /home/siso/forum_project/forum_project
+git pull
+docker stop siso_forum; docker stop siso-postgres
+docker rm siso_forum
+docker build -t forum_app .
+docker start siso-postgres
+docker run -d -p 65000:8080 --name siso_forum \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=1234! \
+  -e DB_HOST=172.245.56.116 \
+  -e DB_PORT=65124 \
+  -e DB_NAME=team_project \
+  forum_app
+cd ..
+cd forum_project_fe
+sudo docker stop siso_forum_fe
+sudo docker rm siso_forum_fe
+git pull
+sudo docker build -t siso_forum_react:latest .
+sudo docker run -d -p 3080:3000 --name siso_forum_fe siso_forum_react:latest
